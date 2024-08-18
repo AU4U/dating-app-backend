@@ -1,35 +1,37 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import Cards from './dbCards.js'
+import Cors from 'cors'
 
+//App Config
 const app = express();
 const port = process.env.PORT || 8001;
-const connection_url = 'mongodb+srv://admin:your_password@cluster0.lggjc.mongodb.net/datingDB?retryWrites=true&w=majority'
-mongoose.connect(connection_url, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true
-}).then(r => console.log('Connected to MongoDB')).catch(e => console.log('Error while connecting to MongoDB'));
+const connection_url = 'mongodb+srv://o381208198:1234@cluster0.maptq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+//Middlewares
+app.use(express.json());
+app.use(Cors());
+mongoose.connect(connection_url).then(r => console.log('Connected to MongoDB')).catch(e => console.log('Error while connecting to MongoDB:' + e));
 app.get("/", (req, res) => res.status(200).send("Hello TheWebDev"));
-app.post('/dating/cards', (req, res) => {
+app.post('/dating/cards', async (req, res) => {
         const dbCard = req.body;
-        Cards.create(dbCard, (err, data) => {
-            if (err) {
-                res.status(500).send(err);
-            } else {
-                res.status(201).send(data);
-            }
-        });
+        try {
+            const data = await Cards.create(dbCard);
+            res.status(201).send(data);
+        } catch (e) {
+            res.status(500).send(e);
+        }
     }
 );
-app.get('/dating/cards', (req, res) => {
-    Cards.find((err, data) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.status(200).send(data);
-        }
-    })
+app.get('/dating/cards', async (req, res) => {
+    try {
+        const data = await Cards.find();
+        console.log(data)
+        res.status(200).json(data);
+    } catch (e) {
+        console.log(e)
+        res.status(500).send(e);
+    }
 })
 app.listen(port, () => console.log(`Listening on localhost: ${port}`));
 
