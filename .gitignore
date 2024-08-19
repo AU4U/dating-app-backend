@@ -1,1 +1,4 @@
 node_modules
+/.idea/modules.xml
+/.idea/dating-app-backend.iml
+/.idea/vcs.xml
